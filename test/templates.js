@@ -61,7 +61,9 @@ describe('script-templates', function () {
 
     describe(name + '.input.check', function () {
       fixtures.valid.forEach(function (f) {
-        var expected = name.toLowerCase() === f.type
+        if (name.toLowerCase() === bscript.types.P2WPKH) return
+        if (name.toLowerCase() === bscript.types.P2WSH) return
+        var expected = name.toLowerCase() === f.type.toLowerCase()
 
         if (inputType && f.input) {
           var input = bscript.fromASM(f.input)

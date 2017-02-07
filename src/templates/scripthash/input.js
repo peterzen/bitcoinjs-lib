@@ -5,12 +5,12 @@ var typeforce = require('typeforce')
 
 function check (script, allowIncomplete) {
   var chunks = bscript.decompile(script)
-  if (chunks.length < 2) return false
+  if (chunks.length < 1) return false
 
   var lastChunk = chunks[chunks.length - 1]
   if (!Buffer.isBuffer(lastChunk)) return false
 
-  var scriptSigChunks = chunks.slice(0, -1)
+  var scriptSigChunks = bscript.decompile(bscript.compile(chunks.slice(0, -1)))
   var redeemScriptChunks = bscript.decompile(lastChunk)
 
   // is redeemScript a valid script?
@@ -21,32 +21,46 @@ function check (script, allowIncomplete) {
 
   var inputType = bscript.classifyInput(scriptSigChunks, allowIncomplete)
   var outputType = bscript.classifyOutput(redeemScriptChunks)
+  if (chunks.length === 1) {
+    return outputType === bscript.types.P2WSH || outputType === bscript.types.P2WPKH
+  }
   return inputType === outputType
 }
 check.toJSON = function () { return 'scriptHash input' }
 
-function encode (redeemScriptSig, redeemScript) {
-  var scriptSigChunks = bscript.decompile(redeemScriptSig)
+function encodeStack (redeemScriptStack, redeemScript) {
   var serializedScriptPubKey = bscript.compile(redeemScript)
 
-  return bscript.compile([].concat(
-    scriptSigChunks,
-    serializedScriptPubKey
-  ))
+  return [].concat(redeemScriptStack, serializedScriptPubKey)
+}
+
+function encode (redeemScriptSig, redeemScript) {
+  var redeemScriptStack = bscript.decompile(redeemScriptSig)
+
+  return bscript.compile(encodeStack(redeemScriptStack, redeemScript))
+}
+
+function decodeStack (stack) {
+  typeforce(check, stack)
+
+  return {
+    redeemScriptStack: stack.slice(0, -1),
+    redeemScript: stack[stack.length - 1]
+  }
 }
 
 function decode (buffer) {
-  var chunks = bscript.decompile(buffer)
-  typeforce(check, chunks)
-
-  return {
-    redeemScriptSig: bscript.compile(chunks.slice(0, -1)),
-    redeemScript: chunks[chunks.length - 1]
-  }
+  var stack = bscript.decompile(buffer)
+  var result = decodeStack(stack)
+  result.redeemScriptSig = bscript.compile(result.redeemScriptStack)
+  delete result.redeemScriptStack
+  return result
 }
 
 module.exports = {
   check: check,
   decode: decode,
-  encode: encode
+  decodeStack: decodeStack,
+  encode: encode,
+  encodeStack: encodeStack
 }

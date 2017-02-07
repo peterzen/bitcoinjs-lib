@@ -55,12 +55,18 @@ function construct (f, dontSign) {
     input.signs.forEach(function (sign) {
       var keyPair = ECPair.fromWIF(sign.keyPair, network)
       var redeemScript
-
+      var witnessScript
+      var value
       if (sign.redeemScript) {
         redeemScript = bscript.fromASM(sign.redeemScript)
       }
-
-      txb.sign(index, keyPair, redeemScript, sign.hashType)
+      if (sign.value) {
+        value = sign.value
+      }
+      if (sign.witnessScript) {
+        witnessScript = bscript.fromASM(sign.witnessScript)
+      }
+      txb.sign(index, keyPair, redeemScript, sign.hashType, value, witnessScript)
     })
   })
 
@@ -82,9 +88,9 @@ describe('TransactionBuilder', function () {
     fixtures.valid.build.forEach(function (f) {
       it('returns TransactionBuilder, with ' + f.description, function () {
         var network = NETWORKS[f.network || 'bitcoin']
+
         var tx = Transaction.fromHex(f.txHex)
         var txb = TransactionBuilder.fromTransaction(tx, network)
-
         assert.strictEqual(txb.build().toHex(), f.txHex)
         assert.strictEqual(txb.network, network)
       })
@@ -283,10 +289,10 @@ describe('TransactionBuilder', function () {
             }
 
             if (!sign.throws) {
-              txb.sign(index, keyPair2, redeemScript, sign.hashType)
+              txb.sign(index, keyPair2, redeemScript, sign.hashType, sign.value)
             } else {
               assert.throws(function () {
-                txb.sign(index, keyPair2, redeemScript, sign.hashType)
+                txb.sign(index, keyPair2, redeemScript, sign.hashType, sign.value)
               }, new RegExp(f.exception))
             }
           })
@@ -300,7 +306,6 @@ describe('TransactionBuilder', function () {
       it('builds "' + f.description + '"', function () {
         var txb = construct(f)
         var tx = txb.build()
-
         assert.strictEqual(tx.toHex(), f.txHex)
       })
     })
@@ -377,7 +382,6 @@ describe('TransactionBuilder', function () {
 
                 tx.ins[i].script = replacement
               }
-
               // now import it
               txb = TransactionBuilder.fromTransaction(tx, network)
             }
@@ -387,7 +391,6 @@ describe('TransactionBuilder', function () {
 
             // update the tx
             tx = txb.buildIncomplete()
-
             // now verify the serialized scriptSig is as expected
             assert.strictEqual(bscript.toASM(tx.ins[i].script), sign.scriptSig)
           })

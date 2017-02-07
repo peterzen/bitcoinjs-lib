@@ -136,7 +136,7 @@ Transaction.fromBuffer = function (buffer, __noStrict) {
 }
 
 Transaction.fromHex = function (hex) {
-  return Transaction.fromBuffer(new Buffer(hex, 'hex'))
+  return Transaction.fromBuffer(Buffer.from(hex, 'hex'))
 }
 
 Transaction.isCoinbaseHash = function (buffer) {
@@ -384,7 +384,6 @@ Transaction.prototype.hashForWitnessV0 = function (inIndex, prevOutScript, value
   writeSlice(hashOutputs)
   writeUInt32(this.locktime)
   writeUInt32(hashType)
-
   return bcrypto.hash256(tbuffer)
 }
 
