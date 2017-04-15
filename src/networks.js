@@ -35,15 +35,15 @@ module.exports = {
     wif: 0xb0,
     dustThreshold: 0 // https://github.com/litecoin-project/litecoin/blob/v0.8.7.2/src/main.cpp#L360-L365
   },
-  dogecoin: {
-    messagePrefix: '\x19Dogecoin Signed Message:\n',
-    bip32: {
-      public: 0x02facafd,
-      private: 0x02fac398
-    },
-    pubKeyHash: 0x1e,
-    scriptHash: 0x16,
-    wif: 0x9e,
-    dustThreshold: 0 // https://github.com/dogecoin/dogecoin/blob/v1.7.1/src/core.h#L155-L160
-  }
+  decred: {
+     messagePrefix: '\x19Decred Signed Message:\n',
+     bip32: {
+       public: 0x02fda926,
+       private: 0x02fda4e8
+     },
+     pubKeyHash: 0x73f,
+     scriptHash: 0x71a,
+     wif: 0x22de,
+     dustThreshold: 546
+   }
 }
