@@ -43,9 +43,9 @@ var Network = typeforce.compile({
     public: UInt32,
     private: UInt32
   },
-  pubKeyHash: UInt8,
-  scriptHash: UInt8,
-  wif: UInt8,
+  pubKeyHash: UInt16,
+  scriptHash: UInt16,
+  wif: UInt16,
   dustThreshold: UInt53
 })
 
