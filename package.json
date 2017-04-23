@@ -1,7 +1,7 @@
 {
-  "name": "bitcoinjs-lib",
-  "version": "2.3.0",
-  "description": "Client-side Bitcoin JavaScript library",
+  "name": "bitcoinjs-lib-decred",
+  "version": "2.3.1",
+  "description": "Client-side Decred JavaScript library",
   "main": "./src/index.js",
   "keywords": [
     "bitcoin",
