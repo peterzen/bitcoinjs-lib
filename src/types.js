@@ -15,6 +15,7 @@ var UINT53_MAX = Math.pow(2, 53) - 1
 var UINT31_MAX = Math.pow(2, 31) - 1
 function UInt2 (value) { return (value & 3) === value }
 function UInt8 (value) { return (value & 0xff) === value }
+function UInt16 (value) { return (value & 0xffff) === value }
 function UInt32 (value) { return (value >>> 0) === value }
 function UInt31 (value) {
   return UInt32(value) && value <= UINT31_MAX
